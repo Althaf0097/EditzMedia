@@ -5,6 +5,9 @@ import Link from 'next/link'
 import ProfileEditForm from '@/components/ProfileEditForm'
 import AvatarUpload from '@/components/AvatarUpload'
 
+// Disable caching to always show fresh data
+export const revalidate = 0
+
 export default async function ProfilePage() {
     const supabase = await createClient()
 
