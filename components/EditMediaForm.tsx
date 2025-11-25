@@ -43,15 +43,15 @@ export default function EditMediaForm({ asset }: EditMediaFormProps) {
         setLoading(true)
 
         try {
-            // @ts-ignore
             const { error } = await supabase
                 .from('media_assets')
+                // @ts-ignore
                 .update({
                     title,
                     description,
                     category_id: category ? parseInt(category) : null,
                     is_recommended: isRecommended
-                } as any)
+                })
                 .eq('id', asset.id)
 
             if (error) throw error

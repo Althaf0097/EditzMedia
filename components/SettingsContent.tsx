@@ -48,10 +48,10 @@ export default function SettingsContent({ user, profile }: SettingsContentProps)
         if (!newName.trim()) return
         setIsLoading(true)
         try {
-            // @ts-ignore
             const { error } = await supabase
                 .from('profiles')
-                .update({ display_name: newName } as any)
+                // @ts-ignore
+                .update({ display_name: newName })
                 .eq('id', user.id)
 
             if (error) throw error
