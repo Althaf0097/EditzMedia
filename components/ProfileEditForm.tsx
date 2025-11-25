@@ -32,7 +32,7 @@ export default function ProfileEditForm({ userId, initialDisplayName, email }: P
             // @ts-ignore - Supabase generated types are too strict
             const { error } = await supabase
                 .from('profiles')
-                .update({ display_name: displayName.trim() })
+                .update({ display_name: displayName.trim() } as any)
                 .eq('id', userId)
 
             if (error) throw error

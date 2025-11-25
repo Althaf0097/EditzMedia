@@ -1,11 +1,14 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { Palette, User as UserIcon, Shield, Info, Sun, Moon, Monitor } from 'lucide-react'
+import { createClient } from '@/lib/supabase/client'
+import { useRouter } from 'next/navigation'
 import { useTheme } from './ThemeProvider'
 
 interface SettingsContentProps {
     user: {
+        id: string
         email?: string
         created_at: string
         user_metadata: {
@@ -35,11 +38,45 @@ export default function SettingsContent({ user, profile }: SettingsContentProps)
         { value: 'system', label: 'System', icon: Monitor, desc: 'Follow system preference' },
     ]
 
-    const joinDate = new Date(user.created_at).toLocaleDateString('en-US', {
+    const [isEditingName, setIsEditingName] = useState(false)
+    const [newName, setNewName] = useState(profile?.display_name || '')
+    const [isLoading, setIsLoading] = useState(false)
+    const supabase = createClient()
+    const router = useRouter()
+
+    const handleUpdateName = async () => {
+        if (!newName.trim()) return
+        setIsLoading(true)
+        try {
+            // @ts-ignore
+            const { error } = await supabase
+                .from('profiles')
+                .update({ display_name: newName } as any)
+                .eq('id', user.id)
+
+            if (error) throw error
+
+            setIsEditingName(false)
+            router.refresh()
+        } catch (error) {
+            console.error('Error updating name:', error)
+            alert('Failed to update name')
+        } finally {
+            setIsLoading(false)
+        }
+    }
+
+    const [mounted, setMounted] = useState(false)
+
+    useEffect(() => {
+        setMounted(true)
+    }, [])
+
+    const joinDate = mounted ? new Date(user.created_at).toLocaleDateString('en-US', {
         month: 'long',
         day: 'numeric',
         year: 'numeric'
-    })
+    }) : ''
 
     return (
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
@@ -54,8 +91,8 @@ export default function SettingsContent({ user, profile }: SettingsContentProps)
                                     key={tab.id}
                                     onClick={() => setActiveTab(tab.id)}
                                     className={`flex items-center gap-2 px-6 py-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap ${activeTab === tab.id
-                                            ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400'
-                                            : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
+                                        ? 'border-indigo-500 text-indigo-600 dark:text-indigo-400'
+                                        : 'border-transparent text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-300 hover:border-gray-300 dark:hover:border-gray-600'
                                         }`}
                                 >
                                     <Icon className="w-4 h-4" />
@@ -81,8 +118,8 @@ export default function SettingsContent({ user, profile }: SettingsContentProps)
                                                 key={option.value}
                                                 onClick={() => setTheme(option.value as 'light' | 'dark' | 'system')}
                                                 className={`relative flex flex-col items-center p-4 rounded-lg border-2 transition-all ${theme === option.value
-                                                        ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-950'
-                                                        : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
+                                                    ? 'border-indigo-500 bg-indigo-50 dark:bg-indigo-950'
+                                                    : 'border-gray-200 dark:border-gray-700 hover:border-gray-300 dark:hover:border-gray-600'
                                                     }`}
                                             >
                                                 <Icon className={`w-8 h-8 mb-2 ${theme === option.value ? 'text-indigo-600 dark:text-indigo-400' : 'text-gray-400'}`} />
@@ -118,7 +155,43 @@ export default function SettingsContent({ user, profile }: SettingsContentProps)
                                 <div className="space-y-4">
                                     <div className="flex justify-between items-center py-3 border-b border-gray-100 dark:border-gray-700">
                                         <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Display Name</span>
-                                        <span className="text-sm text-gray-900 dark:text-gray-100">{profile?.display_name || 'Not set'}</span>
+                                        {isEditingName ? (
+                                            <div className="flex items-center gap-2">
+                                                <input
+                                                    type="text"
+                                                    value={newName}
+                                                    onChange={(e) => setNewName(e.target.value)}
+                                                    className="text-sm border border-gray-300 dark:border-gray-600 rounded px-2 py-1 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                                                />
+                                                <button
+                                                    onClick={handleUpdateName}
+                                                    disabled={isLoading}
+                                                    className="text-xs bg-indigo-600 hover:bg-indigo-700 text-white px-3 py-1.5 rounded transition-colors disabled:opacity-50"
+                                                >
+                                                    {isLoading ? 'Saving...' : 'Save'}
+                                                </button>
+                                                <button
+                                                    onClick={() => {
+                                                        setIsEditingName(false)
+                                                        setNewName(profile?.display_name || '')
+                                                    }}
+                                                    disabled={isLoading}
+                                                    className="text-xs text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 px-2"
+                                                >
+                                                    Cancel
+                                                </button>
+                                            </div>
+                                        ) : (
+                                            <div className="flex items-center gap-4">
+                                                <span className="text-sm text-gray-900 dark:text-gray-100">{profile?.display_name || 'Not set'}</span>
+                                                <button
+                                                    onClick={() => setIsEditingName(true)}
+                                                    className="text-xs text-indigo-600 hover:text-indigo-700 dark:text-indigo-400 dark:hover:text-indigo-300 font-medium"
+                                                >
+                                                    Edit
+                                                </button>
+                                            </div>
+                                        )}
                                     </div>
                                     <div className="flex justify-between items-center py-3 border-b border-gray-100 dark:border-gray-700">
                                         <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Email</span>

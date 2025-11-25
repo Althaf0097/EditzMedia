@@ -14,9 +14,10 @@ interface ProfileDropdownProps {
         }
     }
     isAdmin: boolean
+    avatarUrl?: string | null
 }
 
-export default function ProfileDropdown({ user, isAdmin }: ProfileDropdownProps) {
+export default function ProfileDropdown({ user, isAdmin, avatarUrl }: ProfileDropdownProps) {
     const [isOpen, setIsOpen] = useState(false)
     const dropdownRef = useRef<HTMLDivElement>(null)
     const supabase = createClient()
@@ -55,9 +56,19 @@ export default function ProfileDropdown({ user, isAdmin }: ProfileDropdownProps)
                 onClick={() => setIsOpen(!isOpen)}
                 className="flex items-center gap-2 p-1 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
             >
-                <div className="h-9 w-9 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm shadow-md">
-                    {initial}
-                </div>
+                {avatarUrl ? (
+                    <div className="h-9 w-9 rounded-full overflow-hidden border border-gray-200 dark:border-gray-700">
+                        <img
+                            src={avatarUrl}
+                            alt={displayName}
+                            className="h-full w-full object-cover"
+                        />
+                    </div>
+                ) : (
+                    <div className="h-9 w-9 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm shadow-md">
+                        {initial}
+                    </div>
+                )}
                 <ChevronDown className={`w-4 h-4 text-gray-500 dark:text-gray-400 transition-transform ${isOpen ? 'rotate-180' : ''}`} />
             </button>
 
@@ -67,9 +78,19 @@ export default function ProfileDropdown({ user, isAdmin }: ProfileDropdownProps)
                     {/* User Info Header */}
                     <div className="px-4 py-3 border-b border-gray-100 dark:border-gray-700">
                         <div className="flex items-center gap-3">
-                            <div className="h-10 w-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold">
-                                {initial}
-                            </div>
+                            {avatarUrl ? (
+                                <div className="h-10 w-10 rounded-full overflow-hidden border border-gray-200 dark:border-gray-700">
+                                    <img
+                                        src={avatarUrl}
+                                        alt={displayName}
+                                        className="h-full w-full object-cover"
+                                    />
+                                </div>
+                            ) : (
+                                <div className="h-10 w-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold">
+                                    {initial}
+                                </div>
+                            )}
                             <div className="flex-1 min-w-0">
                                 <p className="text-sm font-semibold text-gray-900 dark:text-gray-100 truncate">{displayName}</p>
                                 <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user.email}</p>

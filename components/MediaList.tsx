@@ -32,7 +32,7 @@ export default async function MediaList() {
 
     return (
         <>
-            {assets.map((asset) => (
+            {assets.map((asset: any) => (
                 <li key={asset.id} className="px-6 py-4 hover:bg-gray-50 transition-colors group">
                     <div className="flex items-center justify-between">
                         <div className="flex items-center min-w-0 flex-1 mr-4">
@@ -70,7 +70,7 @@ export default async function MediaList() {
                                 </div>
                             </div>
                         </div>
-                        <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="flex items-center space-x-1">
                             <Link
                                 href={`/admin/edit/${asset.id}`}
                                 className="p-2 text-gray-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-full transition-colors"

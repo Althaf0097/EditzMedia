@@ -44,15 +44,22 @@ export default function UploadForm() {
             const filePath = `${fileName}`
 
             // 1. Upload to Storage
+            console.log('Uploading file to storage:', filePath)
             const { error: uploadError } = await supabase.storage
-                .from('assets')
-                .upload(filePath, file)
+                .from('media')
+                .upload(filePath, file, {
+                    cacheControl: '3600',
+                    upsert: true
+                })
 
-            if (uploadError) throw uploadError
+            if (uploadError) {
+                console.error('Storage upload error:', uploadError)
+                throw uploadError
+            }
 
             // 2. Get Public URL
             const { data: { publicUrl } } = supabase.storage
-                .from('assets')
+                .from('media')
                 .getPublicUrl(filePath)
 
             // 3. Determine type
@@ -78,9 +85,12 @@ export default function UploadForm() {
                     category_id: parseInt(category),
                     uploader_id: user.id,
                     is_recommended: isRecommended
-                })
+                } as any)
 
-            if (dbError) throw dbError
+            if (dbError) {
+                console.error('Database insert error:', dbError)
+                throw dbError
+            }
 
             setMessage({ type: 'success', text: 'Upload successful!' })
             setFile(null)

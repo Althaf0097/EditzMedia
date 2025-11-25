@@ -9,19 +9,37 @@ export default async function AdminDashboard() {
 
     const {
         data: { user },
-        const { count: imageCount } = await supabase
-            .from('media_assets')
-            .select('*', { count: 'exact', head: true })
-            .eq('asset_type', 'image')
+    } = await supabase.auth.getUser()
+
+    if (!user) {
+        redirect('/admin/login')
+    }
+
+    // Check if admin
+    const { data: profile } = await supabase
+        .from('profiles')
+        .select('is_admin')
+        .eq('id', user.id)
+        .single() as { data: { is_admin: boolean } | null }
+
+    if (!profile?.is_admin) {
+        redirect('/')
+    }
+
+    // Fetch some stats
+    const { count: imageCount } = await supabase
+        .from('media_assets')
+        .select('*', { count: 'exact', head: true })
+        .eq('asset_type', 'image')
 
     const { count: videoCount } = await supabase
-            .from('media_assets')
-            .select('*', { count: 'exact', head: true })
-            .eq('asset_type', 'video')
+        .from('media_assets')
+        .select('*', { count: 'exact', head: true })
+        .eq('asset_type', 'video')
 
     const { count: userCount } = await supabase
-            .from('profiles')
-            .select('*', { count: 'exact', head: true })
+        .from('profiles')
+        .select('*', { count: 'exact', head: true })
 
     return (
         <div className="min-h-screen bg-gray-50/50">

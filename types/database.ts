@@ -84,13 +84,79 @@ export interface Database {
                     }
                 ]
             }
-            [_ in never]: never
+            profiles: {
+                Row: {
+                    id: string
+                    email: string | null
+                    is_admin: boolean
+                    created_at: string
+                    avatar_url: string | null
+                    display_name: string | null
+                }
+                Insert: {
+                    id: string
+                    email?: string | null
+                    is_admin?: boolean
+                    created_at?: string
+                    avatar_url?: string | null
+                    display_name?: string | null
+                }
+                Update: {
+                    id?: string
+                    email?: string | null
+                    is_admin?: boolean
+                    created_at?: string
+                    avatar_url?: string | null
+                    display_name?: string | null
+                }
+                Relationships: [
+                    {
+                        foreignKeyName: "profiles_id_fkey"
+                        columns: ["id"]
+                        isOneToOne: true
+                        referencedRelation: "users"
+                        referencedColumns: ["id"]
+                    }
+                ]
+            }
+            saved_items: {
+                Row: {
+                    id: string
+                    user_id: string
+                    media_asset_id: string
+                    created_at: string
+                }
+                Insert: {
+                    id?: string
+                    user_id: string
+                    media_asset_id: string
+                    created_at?: string
+                }
+                Update: {
+                    id?: string
+                    user_id?: string
+                    media_asset_id?: string
+                    created_at?: string
+                }
+                Relationships: [
+                    {
+                        foreignKeyName: "saved_items_media_asset_id_fkey"
+                        columns: ["media_asset_id"]
+                        isOneToOne: false
+                        referencedRelation: "media_assets"
+                        referencedColumns: ["id"]
+                    },
+                    {
+                        foreignKeyName: "saved_items_user_id_fkey"
+                        columns: ["user_id"]
+                        isOneToOne: false
+                        referencedRelation: "profiles"
+                        referencedColumns: ["id"]
+                    }
+                ]
+            }
         }
-        Enums: {
-            [_ in never]: never
-        }
-        CompositeTypes: {
-            [_ in never]: never
-        }
+        Enums: {}
+        CompositeTypes: {}
     }
 }

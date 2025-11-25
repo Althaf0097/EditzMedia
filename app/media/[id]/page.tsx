@@ -16,7 +16,7 @@ export default async function MediaDetailPage({
         .from('media_assets')
         .select('*, categories(name), profiles(email)')
         .eq('id', id)
-        .single()
+        .single() as { data: any | null }
 
     if (!asset) {
         notFound()
@@ -58,16 +58,36 @@ export default async function MediaDetailPage({
 
                             <div className="flex items-center space-x-4 mb-6">
                                 {isAuthenticated ? (
-                                    <a
-                                        href={asset.file_url}
-                                        download
-                                        target="_blank"
-                                        rel="noopener noreferrer"
+                                    <button
+                                        onClick={async () => {
+                                            try {
+                                                const response = await fetch(asset.file_url)
+                                                const blob = await response.blob()
+                                                const blobUrl = window.URL.createObjectURL(blob)
+
+                                                const link = document.createElement('a')
+                                                link.href = blobUrl
+                                                link.download = asset.title || 'download'
+                                                document.body.appendChild(link)
+                                                link.click()
+                                                document.body.removeChild(link)
+                                                window.URL.revokeObjectURL(blobUrl)
+                                            } catch (error) {
+                                                console.error('Download failed:', error)
+                                                // Fallback
+                                                const link = document.createElement('a')
+                                                link.href = asset.file_url
+                                                link.download = asset.title || 'download'
+                                                document.body.appendChild(link)
+                                                link.click()
+                                                document.body.removeChild(link)
+                                            }
+                                        }}
                                         className="flex-1 bg-black text-white px-6 py-3 rounded-lg font-bold text-center hover:bg-gray-800 transition-colors flex items-center justify-center gap-2"
                                     >
                                         <Download className="w-5 h-5" />
                                         Download
-                                    </a>
+                                    </button>
                                 ) : (
                                     <div className="flex-1 bg-gray-100 text-gray-500 px-6 py-3 rounded-lg font-bold text-center cursor-not-allowed flex items-center justify-center gap-2">
                                         <Download className="w-5 h-5" />
