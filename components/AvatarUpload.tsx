@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, useRef } from 'react'
+import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Camera, Loader2, X, Upload } from 'lucide-react'
 import Image from 'next/image'
@@ -16,6 +17,7 @@ export default function AvatarUpload({ userId, currentAvatarUrl, onUploadComplet
     const [preview, setPreview] = useState<string | null>(null)
     const [showModal, setShowModal] = useState(false)
     const fileInputRef = useRef<HTMLInputElement>(null)
+    const router = useRouter()
     const supabase = createClient()
 
     const handleFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -77,7 +79,11 @@ export default function AvatarUpload({ userId, currentAvatarUrl, onUploadComplet
 
             // Close modal and refresh
             setShowModal(false)
-            window.location.reload()
+            router.refresh()
+
+            if (onUploadComplete) {
+                onUploadComplete()
+            }
         } catch (error: any) {
             console.error('Avatar upload error:', error)
             alert(`Failed to upload avatar: ${error.message || 'Unknown error'}`)
