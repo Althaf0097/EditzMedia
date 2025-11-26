@@ -27,7 +27,7 @@ export default function SearchBar() {
 
             if (data) {
                 // Deduplicate categories by ID
-                const uniqueCategories = Array.from(new Map(data.map(item => [item.id, item])).values())
+                const uniqueCategories = Array.from(new Map(data.map((item: any) => [item.id, item])).values())
                 setCategories(uniqueCategories)
             }
         }
