@@ -1,5 +1,6 @@
 'use client'
 
+// Professional search bar with category filtering
 import { useState, useEffect, useRef } from 'react'
 import { useRouter, useSearchParams, usePathname } from 'next/navigation'
 import { Search, ChevronDown, Filter } from 'lucide-react'
