@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, Suspense } from 'react'
 import { User } from '@supabase/supabase-js'
 import { Menu, X, BarChart } from 'lucide-react'
 import ProfileDropdown from './ProfileDropdown'
@@ -82,7 +82,9 @@ export default function Navbar() {
 
                     {/* Search Bar - Desktop */}
                     <div className="hidden md:flex flex-1 items-center justify-center px-8">
-                        <SearchBar />
+                        <Suspense fallback={<div className="w-full sm:w-80 h-10 bg-gray-100 dark:bg-gray-800 rounded-full animate-pulse" />}>
+                            <SearchBar />
+                        </Suspense>
                     </div>
 
                     <div className="hidden sm:ml-6 sm:flex sm:items-center sm:space-x-2">
