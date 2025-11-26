@@ -8,6 +8,7 @@ import { User } from '@supabase/supabase-js'
 import { Menu, X, BarChart } from 'lucide-react'
 import ProfileDropdown from './ProfileDropdown'
 import ThemeToggle from './ThemeToggle'
+import SearchBar from './SearchBar'
 import Logo from './Logo'
 
 export default function Navbar() {
@@ -66,7 +67,7 @@ export default function Navbar() {
         >
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
                 <div className="flex justify-between h-16">
-                    <div className="flex">
+                    <div className="flex items-center">
                         <div className="flex-shrink-0 flex items-center transform hover:scale-105 transition-transform duration-200">
                             <Logo />
                         </div>
@@ -78,6 +79,12 @@ export default function Navbar() {
                             )}
                         </div>
                     </div>
+
+                    {/* Search Bar - Desktop */}
+                    <div className="hidden md:flex flex-1 items-center justify-center px-8">
+                        <SearchBar />
+                    </div>
+
                     <div className="hidden sm:ml-6 sm:flex sm:items-center sm:space-x-2">
                         <div className="hover:rotate-12 transition-transform duration-300" suppressHydrationWarning>
                             <ThemeToggle />

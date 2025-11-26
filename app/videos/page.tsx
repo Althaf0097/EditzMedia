@@ -4,10 +4,10 @@ import MediaCard from '@/components/MediaCard'
 export default async function VideosPage({
     searchParams,
 }: {
-    searchParams: Promise<{ category?: string }>
+    searchParams: Promise<{ category?: string; search?: string }>
 }) {
     const supabase = await createClient()
-    const { category } = await searchParams
+    const { category, search } = await searchParams
     const categoryId = category
 
     let query = supabase
@@ -18,6 +18,10 @@ export default async function VideosPage({
 
     if (categoryId) {
         query = query.eq('category_id', Number(categoryId))
+    }
+
+    if (search) {
+        query = query.ilike('title', `%${search}%`)
     }
 
     const { data: assets } = await query

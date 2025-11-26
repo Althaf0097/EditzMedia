@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
+import { createPortal } from 'react-dom'
 import { X, Download } from 'lucide-react'
 
 interface MediaPreviewModalProps {
@@ -12,6 +13,13 @@ interface MediaPreviewModalProps {
 }
 
 export default function MediaPreviewModal({ isOpen, onClose, mediaUrl, mediaType, title }: MediaPreviewModalProps) {
+    const [mounted, setMounted] = useState(false)
+
+    useEffect(() => {
+        setMounted(true)
+        return () => setMounted(false)
+    }, [])
+
     // Close on Escape key
     useEffect(() => {
         const handleEscape = (e: KeyboardEvent) => {
@@ -27,7 +35,7 @@ export default function MediaPreviewModal({ isOpen, onClose, mediaUrl, mediaType
         }
     }, [isOpen, onClose])
 
-    if (!isOpen) return null
+    if (!isOpen || !mounted) return null
 
     const handleDownload = async () => {
         try {
@@ -53,13 +61,13 @@ export default function MediaPreviewModal({ isOpen, onClose, mediaUrl, mediaType
         }
     }
 
-    return (
+    return createPortal(
         <div
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+            className="fixed inset-0 z-[100] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
             onClick={onClose}
         >
             <div
-                className="relative w-full max-w-4xl"
+                className="relative w-full max-w-4xl animate-scale-in"
                 onClick={(e) => e.stopPropagation()}
             >
                 {/* Header with title and buttons */}
@@ -110,6 +118,7 @@ export default function MediaPreviewModal({ isOpen, onClose, mediaUrl, mediaType
                     )}
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     )
 }
