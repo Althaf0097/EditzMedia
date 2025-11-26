@@ -140,9 +140,16 @@ export default function Navbar() {
 
             {/* Mobile menu */}
             <div
-                className={`sm:hidden bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
+                className={`sm:hidden bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
                     }`}
             >
+                {/* Mobile Search Bar */}
+                <div className="px-4 pt-3 pb-2">
+                    <Suspense fallback={<div className="w-full h-10 bg-gray-100 dark:bg-gray-800 rounded-full animate-pulse" />}>
+                        <SearchBar />
+                    </Suspense>
+                </div>
+
                 <div className="pt-2 pb-3 space-y-1 px-2">
                     <MobileNavLink href="/images" active={pathname === '/images'}>Images</MobileNavLink>
                     <MobileNavLink href="/videos" active={pathname === '/videos'}>Videos</MobileNavLink>
