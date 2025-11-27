@@ -40,8 +40,8 @@ function LoginForm() {
                 setError(error.message)
                 setLoading(false)
             } else if (data.user) {
-                router.push('/')
-                router.refresh()
+                // Redirect to homepage after successful login
+                window.location.href = '/'
             }
         } catch (err) {
             setError('An unexpected error occurred. Please try again.')
@@ -110,8 +110,8 @@ function LoginForm() {
                             <button
                                 onClick={() => setView('login')}
                                 className={`flex-1 py-3 px-4 rounded-lg font-semibold transition-all duration-300 ${view === 'login'
-                                        ? 'bg-white text-purple-600 shadow-lg lg:bg-gradient-to-r lg:from-blue-500 lg:to-purple-600 lg:text-white'
-                                        : 'text-white/70 lg:text-gray-600 lg:dark:text-gray-400 hover:text-white lg:hover:text-gray-900 lg:dark:hover:text-white'
+                                    ? 'bg-white text-purple-600 shadow-lg lg:bg-gradient-to-r lg:from-blue-500 lg:to-purple-600 lg:text-white'
+                                    : 'text-white/70 lg:text-gray-600 lg:dark:text-gray-400 hover:text-white lg:hover:text-gray-900 lg:dark:hover:text-white'
                                     }`}
                             >
                                 Login
@@ -119,8 +119,8 @@ function LoginForm() {
                             <button
                                 onClick={() => setView('signup')}
                                 className={`flex-1 py-3 px-4 rounded-lg font-semibold transition-all duration-300 ${view === 'signup'
-                                        ? 'bg-white text-purple-600 shadow-lg lg:bg-gradient-to-r lg:from-blue-500 lg:to-purple-600 lg:text-white'
-                                        : 'text-white/70 lg:text-gray-600 lg:dark:text-gray-400 hover:text-white lg:hover:text-gray-900 lg:dark:hover:text-white'
+                                    ? 'bg-white text-purple-600 shadow-lg lg:bg-gradient-to-r lg:from-blue-500 lg:to-purple-600 lg:text-white'
+                                    : 'text-white/70 lg:text-gray-600 lg:dark:text-gray-400 hover:text-white lg:hover:text-gray-900 lg:dark:hover:text-white'
                                     }`}
                             >
                                 Sign Up
