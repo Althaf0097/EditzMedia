@@ -138,51 +138,86 @@ export default function Navbar() {
                 </div>
             </div>
 
-            {/* Mobile menu */}
-            <div
-                className={`sm:hidden bg-white dark:bg-gray-900 border-b border-gray-100 dark:border-gray-800 overflow-hidden transition-all duration-300 ease-in-out ${isOpen ? 'max-h-[500px] opacity-100' : 'max-h-0 opacity-0'
-                    }`}
-            >
-                {/* Mobile Search Bar */}
-                <div className="px-4 pt-3 pb-2">
-                    <Suspense fallback={<div className="w-full h-10 bg-gray-100 dark:bg-gray-800 rounded-full animate-pulse" />}>
-                        <SearchBar />
-                    </Suspense>
-                </div>
+            {/* Mobile menu - Modal Popup */}
+            {isOpen && (
+                <>
+                    {/* Backdrop */}
+                    <div
+                        className="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 animate-fade-in"
+                        onClick={() => setIsOpen(false)}
+                    />
 
-                <div className="pt-2 pb-3 space-y-1 px-2">
-                    <MobileNavLink href="/images" active={pathname === '/images'}>Images</MobileNavLink>
-                    <MobileNavLink href="/videos" active={pathname === '/videos'}>Videos</MobileNavLink>
+                    {/* Modal */}
+                    <div className="fixed inset-x-4 top-20 z-50 animate-slide-up">
+                        <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-800 overflow-hidden">
+                            {/* Mobile Search Bar */}
+                            <div className="px-4 pt-4 pb-3 border-b border-gray-200 dark:border-gray-800">
+                                <Suspense fallback={<div className="w-full h-10 bg-gray-100 dark:bg-gray-800 rounded-full animate-pulse" />}>
+                                    <SearchBar />
+                                </Suspense>
+                            </div>
 
-                    {user && (
-                        <>
-                            <MobileNavLink href="/saved" active={pathname === '/saved'}>Saved Items</MobileNavLink>
-                            <MobileNavLink href="/profile" active={pathname === '/profile'}>My Profile</MobileNavLink>
-                            {isAdmin && (
-                                <MobileNavLink href="/admin" active={pathname.startsWith('/admin')}>Admin Dashboard</MobileNavLink>
+                            {/* Navigation Links */}
+                            <div className="py-2">
+                                <MobileNavLink href="/images" active={pathname === '/images'} onClick={() => setIsOpen(false)}>
+                                    Images
+                                </MobileNavLink>
+                                <MobileNavLink href="/videos" active={pathname === '/videos'} onClick={() => setIsOpen(false)}>
+                                    Videos
+                                </MobileNavLink>
+                                {user && (
+                                    <>
+                                        <MobileNavLink href="/saved" active={pathname === '/saved'} onClick={() => setIsOpen(false)}>
+                                            Saved Items
+                                        </MobileNavLink>
+                                        <MobileNavLink href="/profile" active={pathname === '/profile'} onClick={() => setIsOpen(false)}>
+                                            My Profile
+                                        </MobileNavLink>
+                                        {isAdmin && (
+                                            <MobileNavLink href="/admin" active={pathname.startsWith('/admin')} onClick={() => setIsOpen(false)}>
+                                                Admin Dashboard
+                                            </MobileNavLink>
+                                        )}
+                                    </>
+                                )}
+                            </div>
+
+                            {/* User Section */}
+                            {user ? (
+                                <div className="border-t border-gray-200 dark:border-gray-800 p-4">
+                                    <button
+                                        onClick={async () => {
+                                            await supabase.auth.signOut()
+                                            setIsOpen(false)
+                                            window.location.href = '/login'
+                                        }}
+                                        className="w-full px-4 py-3 bg-red-50 dark:bg-red-950 text-red-600 dark:text-red-400 font-semibold rounded-xl hover:bg-red-100 dark:hover:bg-red-900 transition-colors"
+                                    >
+                                        Logout
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="border-t border-gray-200 dark:border-gray-800 p-4 space-y-2">
+                                    <Link
+                                        href="/login"
+                                        onClick={() => setIsOpen(false)}
+                                        className="block w-full text-center px-4 py-3 border border-gray-300 dark:border-gray-700 shadow-sm font-medium rounded-xl text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
+                                    >
+                                        Log in
+                                    </Link>
+                                    <Link
+                                        href="/login?view=signup"
+                                        onClick={() => setIsOpen(false)}
+                                        className="block w-full text-center px-4 py-3 shadow-sm font-medium rounded-xl text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500 transition-colors"
+                                    >
+                                        Sign up
+                                    </Link>
+                                </div>
                             )}
-                        </>
-                    )}
-                </div>
-                {!user && (
-                    <div className="pt-4 pb-4 border-t border-gray-200 dark:border-gray-800 animate-slide-up">
-                        <div className="mt-3 space-y-1 px-4">
-                            <Link
-                                href="/login"
-                                className="block w-full text-center px-4 py-2 border border-gray-300 dark:border-gray-700 shadow-sm text-base font-medium rounded-md text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                            >
-                                Log in
-                            </Link>
-                            <Link
-                                href="/login?view=signup"
-                                className="block w-full text-center mt-3 px-4 py-2 border border-transparent shadow-sm text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 dark:bg-blue-600 dark:hover:bg-blue-500 transition-colors"
-                            >
-                                Sign up
-                            </Link>
                         </div>
                     </div>
-                )}
-            </div>
+                </>
+            )}
         </nav>
     )
 }
@@ -203,13 +238,14 @@ function NavLink({ href, active, children }: { href: string, active: boolean, ch
     )
 }
 
-function MobileNavLink({ href, active, children }: { href: string, active: boolean, children: React.ReactNode }) {
+function MobileNavLink({ href, active, children, onClick }: { href: string, active: boolean, children: React.ReactNode, onClick?: () => void }) {
     return (
         <Link
             href={href}
-            className={`block pl-3 pr-4 py-2 border-l-4 text-base font-medium transition-all duration-200 ${active
-                ? 'bg-blue-50 dark:bg-blue-950 border-blue-500 text-blue-700 dark:text-blue-400 translate-x-2'
-                : 'border-transparent text-gray-500 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-700 hover:text-gray-700 dark:hover:text-gray-300 hover:translate-x-1'
+            onClick={onClick}
+            className={`block px-4 py-3 text-base font-medium transition-all duration-200 rounded-xl mx-2 ${active
+                ? 'bg-blue-50 dark:bg-blue-950 text-blue-700 dark:text-blue-400'
+                : 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800'
                 }`}
         >
             {children}
