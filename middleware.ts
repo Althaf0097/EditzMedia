@@ -71,14 +71,21 @@ export async function middleware(request: NextRequest) {
         }
 
         // Then check if user is admin (database check)
-        const { data: profile } = await supabase
-            .from('profiles')
-            .select('is_admin')
-            .eq('id', user.id)
-            .single()
+        // Note: This query might fail if RLS is enabled, so we handle errors gracefully
+        try {
+            const { data: profile, error } = await supabase
+                .from('profiles')
+                .select('is_admin')
+                .eq('id', user.id)
+                .single()
 
-        // If not admin, redirect to homepage
-        if (!profile?.is_admin) {
+            // If query failed or user is not admin, redirect to homepage
+            if (error || !profile?.is_admin) {
+                return NextResponse.redirect(new URL('/', request.url))
+            }
+        } catch (error) {
+            // If any error occurs (including RLS blocking), redirect to homepage
+            console.error('Middleware admin check error:', error)
             return NextResponse.redirect(new URL('/', request.url))
         }
     }
