@@ -58,15 +58,28 @@ export async function middleware(request: NextRequest) {
         data: { user },
     } = await supabase.auth.getUser()
 
-    // Protected routes
+    // Protected routes - Homepage requires login
     if (!user && request.nextUrl.pathname === '/') {
         return NextResponse.redirect(new URL('/login', request.url))
     }
 
-    if (!user && request.nextUrl.pathname.startsWith('/admin')) {
-        // Allow access to admin login page
-        if (request.nextUrl.pathname !== '/admin/login') {
-            return NextResponse.redirect(new URL('/admin/login', request.url))
+    // Admin routes - Require authentication AND admin status
+    if (request.nextUrl.pathname.startsWith('/admin')) {
+        // First check if user is logged in
+        if (!user) {
+            return NextResponse.redirect(new URL('/login', request.url))
+        }
+
+        // Then check if user is admin (database check)
+        const { data: profile } = await supabase
+            .from('profiles')
+            .select('is_admin')
+            .eq('id', user.id)
+            .single()
+
+        // If not admin, redirect to homepage
+        if (!profile?.is_admin) {
+            return NextResponse.redirect(new URL('/', request.url))
         }
     }
 
