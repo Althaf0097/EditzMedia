@@ -1,30 +1,36 @@
+require('dotenv').config({ path: '.env.local' });
 const { Client } = require('pg');
 const fs = require('fs');
 const path = require('path');
 
-const connectionString = 'postgresql://postgres:althaf@123@db.thdsfipfnojdxzwelbri.supabase.co:5432/postgres';
+const connectionString = process.env.DATABASE_URL;
 
-async function runMigration() {
-    const client = new Client({
-        connectionString,
-    });
+if (!connectionString) {
+    console.error('❌ ERROR: DATABASE_URL not set in .env.local');
+    console.error('See .env.example for required format.');
+    process.exit(1);
+}
+
+async function fixBucket() {
+    const client = new Client({ connectionString });
 
     try {
         await client.connect();
-        console.log('Connected to database.');
+        console.log('✅ Connected to database.');
 
         const sqlPath = path.join(__dirname, 'fix_bucket_public.sql');
         const sql = fs.readFileSync(sqlPath, 'utf8');
 
-        console.log('Running bucket fix...');
+        console.log('🔄 Running bucket fix...');
         await client.query(sql);
-        console.log('Bucket fix applied successfully.');
+        console.log('✅ Bucket fix completed successfully.');
 
     } catch (err) {
-        console.error('Error running fix:', err);
+        console.error('❌ Error fixing bucket:', err);
+        process.exit(1);
     } finally {
         await client.end();
     }
 }
 
-runMigration();
+fixBucket();
